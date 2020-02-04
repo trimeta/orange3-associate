@@ -567,6 +567,8 @@ def rules_stats(rules, itemsets, n_examples):
         Calculated as: ``n_examples * total_support / lhs_support / rhs_support``
     leverage: float
         Calculated as: ``(total_support * n_examples - lhs_support * rhs_support) / n_examples**2``
+    conviction: float
+        Calculated as: ``(1 - (rhs_support / n_examples)) / (1 - confidence)``
 
     Examples
     --------
@@ -590,8 +592,12 @@ def rules_stats(rules, itemsets, n_examples):
         strength = r_support / l_support
         lift = n_examples * confidence / r_support
         leverage = (support*n_examples - l_support*r_support) / n_examples**2
+        try:
+            conviction = (1 - (r_support / n_examples)) / (1 - confidence)
+        except ZeroDivisionError:
+            conviction = np.nan
         yield (left, right, support, confidence,
-               coverage, strength, lift, leverage)
+               coverage, strength, lift, leverage, conviction)
 
 
 def __fp_tree_count_nodes(tree):
